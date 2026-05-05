@@ -12,13 +12,26 @@ import java.util.List;
 @NoArgsConstructor
 public class PointRankingRequest {
 
-    @NotNull
+    private Status status;
+
+    @NotNull(message = "Latitude is required")
+    @Min(-90)
+    @Max(90)
     private Double latitude;
 
-    @NotNull
+    @NotNull(message = "Longitude is required")
+    @Min(-180)
+    @Max(180)
     private Double longitude;
 
-    private Status status;
+    @NotNull(message = "Max distance is required")
+    @Min(0)
+    @Max(15)
+    private Double maxDistance;
+
+    @Min(0)
+    @Max(1)
+    private double distanceWeight;
 
     @Min(0)
     @Max(1)
