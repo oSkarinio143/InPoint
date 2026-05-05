@@ -10,7 +10,7 @@ import java.util.List;
 public class ParcelLocker {
 
     private String name;
-    private String status;
+    private Status status;
     private List<String> type;
 
     private LocationDto location;

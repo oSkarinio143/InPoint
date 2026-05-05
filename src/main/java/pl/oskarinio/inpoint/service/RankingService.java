@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class RankingService {
 
     private final ParcelLockerFetchingService parcelLockerFetchingService;
-    private static final double PROXIMITY_THRESHOLD = 0.1;
+    private static final double PROXIMITY_THRESHOLD = 50;
 
     public PointRankingResponse handleRanking(PointRankingRequest pointRankingRequest) {
         log.info("Ranking process started for coordinates: [{}, {}]",
