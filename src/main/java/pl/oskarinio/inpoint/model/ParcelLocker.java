@@ -31,4 +31,7 @@ public class ParcelLocker {
 
     @JsonProperty("print_in_store")
     private Boolean printInStore;
+
+    @JsonProperty("location_type")
+    private String locationType;
 }

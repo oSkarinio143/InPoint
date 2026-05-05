@@ -12,14 +12,15 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static reactor.netty.http.HttpConnectionLiveness.log;
 
 @Service
 @RequiredArgsConstructor
 public class FilterService {
 
+    private static final double PROXIMITY_THRESHOLD = 0.1;
+
     private final ParcelLockerFetchingService parcelLockerFetchingService;
-    private static final double PROXIMITY_THRESHOLD = 50;
+
     public List<ParcelLocker> getNearbyLockers(PointRankingRequest request) {
         return parcelLockerFetchingService.getAllLockersAsList().parallelStream()
                 .filter(locker -> isWithinRange(locker, request.getLatitude(), request.getLongitude()))
