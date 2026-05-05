@@ -2,9 +2,12 @@ package pl.oskarinio.inpoint.model;
 
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
-
+@Data
+@NoArgsConstructor
 public class PointRankingRequest {
 
     @NotNull
