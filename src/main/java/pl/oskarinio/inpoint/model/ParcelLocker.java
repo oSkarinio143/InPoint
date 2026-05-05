@@ -6,18 +6,16 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true) // Ignoruje setki innych pól z API InPost
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ParcelLocker {
 
     private String name;
     private String status;
     private List<String> type;
 
-    // Zagnieżdżony obiekt lokalizacji w JSON
-    private LocationData location;
+    private LocationDto location;
 
-    // Zagnieżdżony obiekt adresu w JSON
-    private AddressData address;
+    private AddressDto address;
 
     @JsonProperty("location_247")
     private boolean location247;
@@ -32,18 +30,5 @@ public class ParcelLocker {
     private boolean paymentAvailable;
 
     @JsonProperty("print_in_store")
-    private Boolean printInStore; // Używamy Boolean, bo w JSON może być null
-
-    // Podklasy pomocnicze do mapowania struktury JSON
-    @Data
-    public static class LocationData {
-        private double latitude;
-        private double longitude;
-    }
-
-    @Data
-    public static class AddressData {
-        private String line1;
-        private String line2;
-    }
+    private Boolean printInStore;
 }

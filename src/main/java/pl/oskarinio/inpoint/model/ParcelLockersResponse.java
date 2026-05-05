@@ -12,7 +12,7 @@ public class ParcelLockersResponse {
 
     private List<ParcelLocker> items;
 
-    @JsonProperty("total_pages") // Kluczowe: mapuje "total_pages" z JSON na zmienną w Javie
+    @JsonProperty("total_pages")
     private int totalPages;
 
     private int count;

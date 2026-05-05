@@ -21,6 +21,7 @@ public class RankingController {
     @PostMapping("/points")
     public ResponseEntity<PointRankingResponse> findBestPoint(@Valid @RequestBody PointRankingRequest pointRankingRequest){
         PointRankingResponse response = rankingService.handleRanking(pointRankingRequest);
+        System.out.println(response);
         return ResponseEntity.ok(response);
     }
 }
