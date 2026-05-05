@@ -10,17 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.oskarinio.inpoint.model.PointRankingRequest;
 import pl.oskarinio.inpoint.model.PointRankingResponse;
 import pl.oskarinio.inpoint.service.RankingService;
+import pl.oskarinio.inpoint.service.RequestService;
 
 @RestController
 @RequestMapping("inpoint/rank")
 @RequiredArgsConstructor
 public class RankingController {
 
-    private final RankingService rankingService;
+    private final RequestService requestService;
 
     @PostMapping("/points")
     public ResponseEntity<PointRankingResponse> findBestPoint(@Valid @RequestBody PointRankingRequest pointRankingRequest){
-        PointRankingResponse response = rankingService.handleRanking(pointRankingRequest);
+        PointRankingResponse response = requestService.handleRequest(pointRankingRequest);
         System.out.println(response);
         return ResponseEntity.ok(response);
     }
