@@ -1,5 +1,10 @@
 package pl.oskarinio.inpoint.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum Status {
-    OPERATING, CREATED
+    @JsonProperty("Operating")
+    OPERATING,
+    @JsonProperty("Created")
+    CREATED
 }
