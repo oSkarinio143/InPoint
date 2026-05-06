@@ -3,8 +3,8 @@ package pl.oskarinio.inpoint.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.oskarinio.inpoint.model.ParcelLocker;
-import pl.oskarinio.inpoint.model.PointRankingRequest;
-import pl.oskarinio.inpoint.model.PointRankingResponse;
+import pl.oskarinio.inpoint.model.PointRequest;
+import pl.oskarinio.inpoint.model.PointResult;
 
 import java.util.List;
 
@@ -17,10 +17,10 @@ public class RequestService {
     private final FilterService filterService;
     private final RankingService rankingService;
 
-    public PointRankingResponse handleRequest(PointRankingRequest pointRankingRequest) {
+    public List<PointResult> handleRequest(PointRequest pointRequest) {
         log.info("Ranking process started for coordinates: [{}, {}]",
-                pointRankingRequest.getLatitude(), pointRankingRequest.getLongitude());
-        List<ParcelLocker> filtered = filterService.getNearbyLockers(pointRankingRequest);
+                pointRequest.getLatitude(), pointRequest.getLongitude());
+        List<ParcelLocker> filtered = filterService.getNearbyLockers(pointRequest);
 
         ParcelLocker p = filtered.get(0);
         System.out.println(p.getStatus());
@@ -35,10 +35,10 @@ public class RequestService {
         System.out.println(p.getLocationType());
         log.info("Filtering completed. Found {} candidates.", filtered.size());
 
-        List<PointRankingResponse> responseList = rankingService.handleRanking(filtered, pointRankingRequest);
-        responseList.forEach(v ->
-                System.out.println(v));
-
-        return filtered.isEmpty() ? null : filterService.mapParcelToResponse(filtered.get(0));
+        List<PointResult> responseList = rankingService.handleRanking(filtered, pointRequest);
+        List<PointResult> finalList = responseList.stream()
+                        .limit(10).toList();
+        return finalList;
+        //return filtered.isEmpty() ? null : filterService.mapParcelToResponse(filtered.get(0));
     }
 }

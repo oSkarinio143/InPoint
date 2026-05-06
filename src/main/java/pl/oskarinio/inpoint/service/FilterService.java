@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.oskarinio.inpoint.model.AddressDto;
 import pl.oskarinio.inpoint.model.ParcelLocker;
-import pl.oskarinio.inpoint.model.PointRankingRequest;
-import pl.oskarinio.inpoint.model.PointRankingResponse;
+import pl.oskarinio.inpoint.model.PointRequest;
+import pl.oskarinio.inpoint.model.PointResult;
 
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +21,7 @@ public class FilterService {
 
     private final ParcelLockerFetchingService parcelLockerFetchingService;
 
-    public List<ParcelLocker> getNearbyLockers(PointRankingRequest request) {
+    public List<ParcelLocker> getNearbyLockers(PointRequest request) {
         return parcelLockerFetchingService.getAllLockersAsList().parallelStream()
                 .filter(locker -> isWithinRange(locker, request.getLatitude(), request.getLongitude()))
                 .collect(Collectors.toList());
@@ -36,27 +36,5 @@ public class FilterService {
         double longitudeDifference = Math.abs(locker.getLocation().longitude() - userLongitude);
 
         return latitudeDifference <= PROXIMITY_THRESHOLD && longitudeDifference <= PROXIMITY_THRESHOLD;
-    }
-
-    public PointRankingResponse mapParcelToResponse(ParcelLocker locker) {
-        return new PointRankingResponse(
-                0.0,
-                locker.getName(),
-                formatAddress(locker.getAddress()),
-                locker.getLocation().latitude(),
-                locker.getLocation().longitude()
-        );
-    }
-
-    private String formatAddress(AddressDto address) {
-        if (address == null) {
-            return "No address data";
-        }
-
-        return Stream.of(address.line1(), address.line2())
-                .filter(Objects::nonNull)
-                .map(String::trim)
-                .filter(line -> !line.isEmpty())
-                .collect(Collectors.joining(" "));
     }
 }

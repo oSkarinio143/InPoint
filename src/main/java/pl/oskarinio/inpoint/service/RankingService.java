@@ -13,60 +13,81 @@ public class RankingService {
 
     private static final double K_SENSITIVITY = 0.067;
 
-    // Reguły mapujące cechy paczkomatu na wagi z requestu
     private static final List<RankingRule> RULES = List.of(
-            new RankingRule(ParcelLocker::isLocation247, PointRankingRequest::getLocation247Weight),
-            new RankingRule(ParcelLocker::isNext, PointRankingRequest::getIsNextWeight),
-            new RankingRule(ParcelLocker::isEasyAccessZone, PointRankingRequest::getEasyAccessZoneWeight),
-            new RankingRule(ParcelLocker::isPaymentAvailable, PointRankingRequest::getPaymentAvailableWeight),
-            new RankingRule(l -> l.getPrintInStore() != null && l.getPrintInStore(), PointRankingRequest::getPrintInStoreWeight),
-            new RankingRule(l -> "Indoor".equalsIgnoreCase(l.getLocationType()), PointRankingRequest::getLocationTypeWeight)
+            new RankingRule(ParcelLocker::isLocation247, PointRequest::getLocation247Weight),
+            new RankingRule(ParcelLocker::isNext, PointRequest::getIsNextWeight),
+            new RankingRule(ParcelLocker::isEasyAccessZone, PointRequest::getEasyAccessZoneWeight),
+            new RankingRule(ParcelLocker::isPaymentAvailable, PointRequest::getPaymentAvailableWeight),
+            new RankingRule(l -> Boolean.TRUE.equals(l.getPrintInStore()), PointRequest::getPrintInStoreWeight),
+            new RankingRule(l -> "Indoor".equalsIgnoreCase(l.getLocationType()), PointRequest::getLocationTypeWeight)
     );
 
-    public List<PointRankingResponse> handleRanking(List<ParcelLocker> lockers, PointRankingRequest request) {
-        double maxPotential = calculateMaxPotential(request);
-        if (maxPotential <= 0) return Collections.emptyList();
+    public List<PointResult> handleRanking(List<ParcelLocker> lockers, PointRequest request) {
+        double totalWeight = calculateTotalWeight(request);
 
+        // Nawet jeśli totalWeight <= 0, chcemy policzyć dystans dla każdego punktu
         return lockers.parallelStream()
-                .map(locker -> calculateMatch(locker, request, maxPotential))
-                .sorted(Comparator.comparingDouble(PointRankingResponse::getTotalScore).reversed())
+                .map(locker -> calculatePoint(locker, request, totalWeight))
+                .sorted(Comparator.comparingDouble(PointResult::getAgreementPercentage).reversed())
                 .collect(Collectors.toList());
     }
 
-    private PointRankingResponse calculateMatch(ParcelLocker locker, PointRankingRequest request, double maxPotential) {
+    private PointResult calculatePoint(ParcelLocker locker, PointRequest request, double totalWeight) {
+        // 1. Obliczamy fizyczny dystans (Haversine)
         double distance = calculateHaversine(
                 request.getLatitude(), request.getLongitude(),
                 locker.getLocation().latitude(), locker.getLocation().longitude()
         );
 
-        // Nasz sprawiedliwy mnożnik S: (R - d) / (R * (1 + k * d))
-        double R = request.getMaxDistance();
-        double proximityMultiplier = Math.max(0, (R - distance) / (R * (1 + K_SENSITIVITY * distance)));
+        double agreementPercentage = 0.0;
 
-        // Sumujemy potencjał paczkomatu (Baza dystansu + cechy)
-        double currentPotential = request.getDistanceWeight();
-        for (RankingRule rule : RULES) {
-            if (rule.feature().test(locker)) {
-                currentPotential += rule.weight().applyAsDouble(request);
+        // 2. Liczymy scoring tylko, jeśli suma wag jest dodatnia
+        if (totalWeight > 0) {
+            double R = request.getMaxDistance();
+            double proximityScore = 0;
+
+            if (distance <= R) {
+                proximityScore = (R - distance) / (R * (1 + K_SENSITIVITY * distance));
             }
+
+            double earnedPoints = 0;
+            // Punkty za dystans
+            earnedPoints += request.getDistanceWeight() * proximityScore;
+
+            // Punkty za cechy
+            for (RankingRule rule : RULES) {
+                if (rule.feature.test(locker)) {
+                    earnedPoints += rule.weightGetter.applyAsDouble(request);
+                }
+            }
+
+            double score = (earnedPoints / totalWeight) * 100.0;
+            agreementPercentage = Math.round(score * 100.0) / 100.0;
         }
 
-        // Wynik %: (Potencjał * Mnożnik / MaxPotencjał) * 100
-        double score = ((currentPotential * proximityMultiplier) / maxPotential) * 100;
-
-        return new PointRankingResponse(
-                Math.round(score * 100.0) / 100.0,
+        // 3. Tworzymy wynik (zaokrąglamy dystans do 2 miejsc po przecinku)
+        return new PointResult(
+                agreementPercentage,
                 locker.getName(),
                 locker.getAddress().line1() + " " + locker.getAddress().line2(),
+                Math.round(distance * 100.0) / 100.0, // Nowe pole: dystans w km
                 locker.getLocation().latitude(),
-                locker.getLocation().longitude()
+                locker.getLocation().longitude(),
+                locker.isLocation247(),
+                locker.isNext(),
+                locker.isEasyAccessZone(),
+                locker.isPaymentAvailable(),
+                locker.getPrintInStore(),
+                locker.getLocationType()
         );
     }
 
-    private double calculateMaxPotential(PointRankingRequest r) {
-        return r.getDistanceWeight() + RULES.stream()
-                .mapToDouble(rule -> rule.weight().applyAsDouble(r))
-                .sum();
+    private double calculateTotalWeight(PointRequest r) {
+        double sum = r.getDistanceWeight();
+        for (RankingRule rule : RULES) {
+            sum += rule.weightGetter.applyAsDouble(r);
+        }
+        return sum;
     }
 
     private double calculateHaversine(double lat1, double lon1, double lat2, double lon2) {
@@ -80,6 +101,6 @@ public class RankingService {
 
     private record RankingRule(
             Predicate<ParcelLocker> feature,
-            ToDoubleFunction<PointRankingRequest> weight
+            ToDoubleFunction<PointRequest> weightGetter
     ) {}
 }
