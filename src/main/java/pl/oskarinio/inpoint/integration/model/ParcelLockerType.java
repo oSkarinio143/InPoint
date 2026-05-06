@@ -1,4 +1,4 @@
-package pl.oskarinio.inpoint.model.api;
+package pl.oskarinio.inpoint.integration.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

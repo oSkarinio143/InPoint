@@ -1,13 +1,13 @@
-package pl.oskarinio.inpoint.service;
+package pl.oskarinio.inpoint.engine;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.oskarinio.inpoint.model.*;
-import pl.oskarinio.inpoint.model.api.ParcelLocker;
-import pl.oskarinio.inpoint.model.RankingContext;
-import pl.oskarinio.inpoint.model.ScoreComponent;
-import pl.oskarinio.inpoint.model.PointRequest;
+import pl.oskarinio.inpoint.dto.PointResult;
+import pl.oskarinio.inpoint.integration.model.ParcelLocker;
+import pl.oskarinio.inpoint.engine.model.RankingContext;
+import pl.oskarinio.inpoint.engine.model.ScoreComponent;
+import pl.oskarinio.inpoint.dto.PointRequest;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -1,6 +1,4 @@
-package pl.oskarinio.inpoint.model.api;
-
-import lombok.Data;
+package pl.oskarinio.inpoint.integration.model;
 
 public record LocationDto(double latitude, double longitude) {
 }

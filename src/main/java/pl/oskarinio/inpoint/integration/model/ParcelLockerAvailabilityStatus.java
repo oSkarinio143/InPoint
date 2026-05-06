@@ -1,4 +1,4 @@
-package pl.oskarinio.inpoint.model.api;
+package pl.oskarinio.inpoint.integration.model;
 
 public enum ParcelLockerAvailabilityStatus {
     NO_DATA,

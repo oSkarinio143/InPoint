@@ -1,12 +1,12 @@
-package pl.oskarinio.inpoint.model;
+package pl.oskarinio.inpoint.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.oskarinio.inpoint.model.api.ParcelLockerStatus;
-import pl.oskarinio.inpoint.model.api.ParcelLockerType;
+import pl.oskarinio.inpoint.integration.model.ParcelLockerStatus;
+import pl.oskarinio.inpoint.integration.model.ParcelLockerType;
 
 @Data
 @NoArgsConstructor

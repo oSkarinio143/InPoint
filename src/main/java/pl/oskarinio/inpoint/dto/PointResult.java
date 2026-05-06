@@ -1,10 +1,10 @@
-package pl.oskarinio.inpoint.model;
+package pl.oskarinio.inpoint.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.oskarinio.inpoint.model.api.ParcelLockerAvailabilityStatus;
-import pl.oskarinio.inpoint.model.api.ParcelLockerType;
+import pl.oskarinio.inpoint.integration.model.ParcelLockerAvailabilityStatus;
+import pl.oskarinio.inpoint.integration.model.ParcelLockerType;
 
 import java.util.List;
 

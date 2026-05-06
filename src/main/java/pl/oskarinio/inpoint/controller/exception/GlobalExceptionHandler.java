@@ -1,4 +1,4 @@
-package pl.oskarinio.inpoint.controller;
+package pl.oskarinio.inpoint.controller.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

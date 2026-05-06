@@ -1,10 +1,10 @@
-package pl.oskarinio.inpoint.service;
+package pl.oskarinio.inpoint.engine;
 
 import org.springframework.stereotype.Service;
-import pl.oskarinio.inpoint.model.DistanceCalculationData;
-import pl.oskarinio.inpoint.model.api.ParcelLocker;
-import pl.oskarinio.inpoint.model.PointRequest;
-import pl.oskarinio.inpoint.model.api.LocationDto;
+import pl.oskarinio.inpoint.engine.model.DistanceCalculationData;
+import pl.oskarinio.inpoint.integration.model.ParcelLocker;
+import pl.oskarinio.inpoint.dto.PointRequest;
+import pl.oskarinio.inpoint.integration.model.LocationDto;
 
 @Service
 public class DistanceCalculatorService {

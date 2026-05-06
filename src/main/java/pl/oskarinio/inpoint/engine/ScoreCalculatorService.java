@@ -1,11 +1,11 @@
-package pl.oskarinio.inpoint.service;
+package pl.oskarinio.inpoint.engine;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.oskarinio.inpoint.model.api.ParcelLocker;
-import pl.oskarinio.inpoint.model.api.ParcelLockerAvailabilityStatus;
-import pl.oskarinio.inpoint.model.api.ParcelLockerType;
-import pl.oskarinio.inpoint.model.PointRequest;
+import pl.oskarinio.inpoint.integration.model.ParcelLocker;
+import pl.oskarinio.inpoint.integration.model.ParcelLockerAvailabilityStatus;
+import pl.oskarinio.inpoint.integration.model.ParcelLockerType;
+import pl.oskarinio.inpoint.dto.PointRequest;
 
 import java.util.List;
 

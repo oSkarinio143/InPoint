@@ -1,10 +1,12 @@
-package pl.oskarinio.inpoint.service;
+package pl.oskarinio.inpoint;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pl.oskarinio.inpoint.model.api.ParcelLocker;
-import pl.oskarinio.inpoint.model.PointRequest;
-import pl.oskarinio.inpoint.model.PointResult;
+import pl.oskarinio.inpoint.dto.PointRequest;
+import pl.oskarinio.inpoint.dto.PointResult;
+import pl.oskarinio.inpoint.engine.FilterService;
+import pl.oskarinio.inpoint.engine.RankingService;
+import pl.oskarinio.inpoint.integration.model.ParcelLocker;
 
 import java.util.List;
 
@@ -22,7 +24,8 @@ public class RequestService {
                 pointRequest.getLatitude(), pointRequest.getLongitude());
         List<ParcelLocker> filtered = filterService.getNearbyLockers(pointRequest);
         log.info("Filtering completed. Found {} candidates.", filtered.size());
-
-        return rankingService.rankPoints(filtered, pointRequest);
+        List<PointResult> rankedPoints = rankingService.rankPoints(filtered, pointRequest);
+        log.info("Ranking completed. Sending result to user");
+        return rankedPoints;
     }
 }

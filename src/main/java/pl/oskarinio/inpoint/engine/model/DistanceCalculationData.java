@@ -1,4 +1,4 @@
-package pl.oskarinio.inpoint.model;
+package pl.oskarinio.inpoint.engine.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

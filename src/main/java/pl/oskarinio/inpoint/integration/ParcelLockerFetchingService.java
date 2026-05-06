@@ -1,4 +1,4 @@
-package pl.oskarinio.inpoint.service;
+package pl.oskarinio.inpoint.integration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,8 +7,8 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import pl.oskarinio.inpoint.model.api.ParcelLocker;
-import pl.oskarinio.inpoint.model.ParcelLockersResponse;
+import pl.oskarinio.inpoint.integration.model.ParcelLocker;
+import pl.oskarinio.inpoint.integration.model.ParcelLockersResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;

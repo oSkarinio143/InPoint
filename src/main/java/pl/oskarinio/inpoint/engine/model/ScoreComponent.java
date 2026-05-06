@@ -1,7 +1,7 @@
-package pl.oskarinio.inpoint.model;
+package pl.oskarinio.inpoint.engine.model;
 
-import pl.oskarinio.inpoint.model.api.ParcelLocker;
-import pl.oskarinio.inpoint.model.PointRequest;
+import pl.oskarinio.inpoint.integration.model.ParcelLocker;
+import pl.oskarinio.inpoint.dto.PointRequest;
 
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
