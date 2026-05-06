@@ -13,24 +13,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FilterService {
 
-    private static final double PROXIMITY_THRESHOLD = 0.1;
-
     private final ParcelLockerFetchingService parcelLockerFetchingService;
+    private final DistanceCalculatorService distanceCalculatorService;
 
     public List<ParcelLocker> getNearbyLockers(PointRequest request) {
         return parcelLockerFetchingService.getAllLockersAsList().parallelStream()
-                .filter(locker -> isWithinRange(locker, request.getLatitude(), request.getLongitude()))
+                .filter(locker -> locker.getLocation() != null)
+                .filter(locker -> distanceCalculatorService.calculateDistance(request, locker) <= request.getMaxDistance())
                 .collect(Collectors.toList());
-    }
-
-    private boolean isWithinRange(ParcelLocker locker, double userLatitude, double userLongitude) {
-        if (locker.getLocation() == null) {
-            return false;
-        }
-
-        double latitudeDifference = Math.abs(locker.getLocation().latitude() - userLatitude);
-        double longitudeDifference = Math.abs(locker.getLocation().longitude() - userLongitude);
-
-        return latitudeDifference <= PROXIMITY_THRESHOLD && longitudeDifference <= PROXIMITY_THRESHOLD;
     }
 }

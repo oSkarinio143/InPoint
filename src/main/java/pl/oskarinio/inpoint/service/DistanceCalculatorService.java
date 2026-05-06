@@ -9,6 +9,7 @@ import pl.oskarinio.inpoint.model.record.LocationDto;
 @Service
 public class DistanceCalculatorService {
 
+    private static final double EARTH_RADIUS = 6371.0;
     public double calculateDistance(PointRequest request, ParcelLocker locker) {
         DistanceCalculationData distanceCalculationData = getDistanceCalculationData(request, locker);
         return calculateHaversinePattern(distanceCalculationData);
@@ -27,11 +28,10 @@ public class DistanceCalculatorService {
     }
 
     private double calculateHaversinePattern(DistanceCalculationData distanceCalculationData){
-        double earthRadius = 6371;
         double factor = Math.sin(distanceCalculationData.getDifferenceLatitude() / 2) * Math.sin(distanceCalculationData.getDifferenceLatitude() / 2) +
                 Math.cos(Math.toRadians(distanceCalculationData.getLockerLatitude())) * Math.cos(Math.toRadians(distanceCalculationData.getRequestLatitude())) *
                         Math.sin(distanceCalculationData.getDifferenceLongitude() / 2) * Math.sin(distanceCalculationData.getDifferenceLongitude() / 2);
-        return earthRadius * 2 * Math.atan2(Math.sqrt(factor), Math.sqrt(1 - factor));
+        return EARTH_RADIUS * 2 * Math.atan2(Math.sqrt(factor), Math.sqrt(1 - factor));
 
     }
 }

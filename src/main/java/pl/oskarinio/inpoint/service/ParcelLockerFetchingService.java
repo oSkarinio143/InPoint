@@ -26,7 +26,7 @@ public class ParcelLockerFetchingService {
 
     @Value("${inpost.api.url}")
     private String apiUrl;
-    @Value("${inpost.api.page-size:500}")
+    @Value("${inpost.api.page-size:1000}")
     private int pageSize;
     @Value("${inpost.api.threads.amount:50}")
     private int threadsAmount;
