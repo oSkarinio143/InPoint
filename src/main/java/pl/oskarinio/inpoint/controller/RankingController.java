@@ -21,9 +21,9 @@ public class RankingController {
     private final RequestService requestService;
 
     @PostMapping("/points")
-    public ResponseEntity<List<PointResult>> findBestPoint(@Valid @RequestBody PointRequest pointRequest){
+    public ResponseEntity<PointResult> findBestPoint(@Valid @RequestBody PointRequest pointRequest){
         List<PointResult> response = requestService.handleRequest(pointRequest);
-        System.out.println(response);
-        return ResponseEntity.ok(response);
+        //System.out.println(response);
+        return ResponseEntity.ok(response.get(0));
     }
 }

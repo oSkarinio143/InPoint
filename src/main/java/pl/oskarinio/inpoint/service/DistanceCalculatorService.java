@@ -10,6 +10,7 @@ import pl.oskarinio.inpoint.model.record.LocationDto;
 public class DistanceCalculatorService {
 
     private static final double EARTH_RADIUS = 6371.0;
+
     public double calculateDistance(PointRequest request, ParcelLocker locker) {
         DistanceCalculationData distanceCalculationData = getDistanceCalculationData(request, locker);
         return calculateHaversinePattern(distanceCalculationData);

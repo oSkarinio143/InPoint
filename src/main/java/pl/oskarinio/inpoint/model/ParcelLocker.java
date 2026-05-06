@@ -7,6 +7,7 @@ import pl.oskarinio.inpoint.model.record.AddressDto;
 import pl.oskarinio.inpoint.model.record.LocationDto;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,7 +15,6 @@ public class ParcelLocker {
 
     private String name;
     private Status status;
-    private List<String> type;
 
     private LocationDto location;
 
@@ -37,4 +37,16 @@ public class ParcelLocker {
 
     @JsonProperty("location_type")
     private String locationType;
+
+    @JsonProperty("air_index_level")
+    private String airIndexLevel;
+
+    @JsonProperty("type")
+    private List<String> type;
+
+    @JsonProperty("locker_availability")
+    private Map<String, Object> lockerAvailability;
+
+    @JsonProperty("functions")
+    private List<String> functions;
 }

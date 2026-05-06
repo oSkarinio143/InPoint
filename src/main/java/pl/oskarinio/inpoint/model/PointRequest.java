@@ -25,7 +25,7 @@ public class PointRequest {
 
     @NotNull(message = "Max distance is required")
     @Min(0)
-    @Max(15)
+    //@Max(15)
     private Double maxDistance;
 
     @Min(0)
@@ -55,4 +55,8 @@ public class PointRequest {
     @Min(0)
     @Max(1)
     private double locationTypeWeight;
+
+    @Min(0)
+    @Max(1)
+    private Double airIndexLevelWeight;
 }

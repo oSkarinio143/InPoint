@@ -1,12 +1,14 @@
 package pl.oskarinio.inpoint.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.oskarinio.inpoint.model.*;
 import pl.oskarinio.inpoint.model.record.RankingContext;
-import pl.oskarinio.inpoint.model.record.RankingRule;
+import pl.oskarinio.inpoint.model.record.ScoreComponent;
 
 import java.util.*;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -14,17 +16,33 @@ import java.util.stream.Collectors;
 public class RankingService {
 
     //Wartosc dobrana aby wynik punktowy spadal odpowiednio w miare spadku odleglosci (subiektywna ocena)
-    private static final double K_SENSITIVITY = 0.067;
 
     private final DistanceCalculatorService distanceCalculatorService;
-    private static final List<RankingRule> RULES = List.of(
-            new RankingRule(ParcelLocker::isLocation247, PointRequest::getLocation247Weight),
-            new RankingRule(ParcelLocker::isNext, PointRequest::getIsNextWeight),
-            new RankingRule(ParcelLocker::isEasyAccessZone, PointRequest::getEasyAccessZoneWeight),
-            new RankingRule(ParcelLocker::isPaymentAvailable, PointRequest::getPaymentAvailableWeight),
-            new RankingRule(locker -> Boolean.TRUE.equals(locker.getPrintInStore()), PointRequest::getPrintInStoreWeight),
-            new RankingRule(locker -> "Indoor".equalsIgnoreCase(locker.getLocationType()), PointRequest::getLocationTypeWeight)
-    );
+    private final ScoreCalculatorService scoreCalculatorService;
+
+    private List<ScoreComponent> scoreComponents;
+
+    @PostConstruct
+    private void initializeScoreComponents(){
+        this.scoreComponents = List.of(
+                new ScoreComponent(PointRequest::getDistanceWeight,
+                        (locker, request) -> scoreCalculatorService.countDistanceScore(request, locker)),
+                new ScoreComponent(PointRequest::getLocation247Weight,
+                        (locker, request) -> scoreCalculatorService.countLocation247Score(locker)),
+                new ScoreComponent(PointRequest::getIsNextWeight,
+                        (locker, request) -> scoreCalculatorService.countIsNextScore(locker)),
+                new ScoreComponent(PointRequest::getEasyAccessZoneWeight,
+                        (locker, request) -> scoreCalculatorService.countEasyAccessScore(locker)),
+                new ScoreComponent(PointRequest::getPaymentAvailableWeight,
+                        (locker, request) -> scoreCalculatorService.countPaymentScore(locker)),
+                new ScoreComponent(PointRequest::getPrintInStoreWeight,
+                        (locker, request) -> scoreCalculatorService.countPrintInStoreScore(locker)),
+                new ScoreComponent(PointRequest::getLocationTypeWeight,
+                        (locker, request) -> scoreCalculatorService.countIndoorScore(locker)),
+                new ScoreComponent(PointRequest::getAirIndexLevelWeight,
+                        (locker, request) -> scoreCalculatorService.countAirIndexScore(locker))
+        );
+    }
 
     public List<PointResult> rankPoints(List<ParcelLocker> lockers, PointRequest request) {
         double totalWeight = calculateTotalWeight(request);
@@ -42,7 +60,8 @@ public class RankingService {
     }
 
     private RankingContext getRankingContext(PointRequest request, ParcelLocker locker, double totalWeight, double distance){
-        return new RankingContext(request,
+        return new RankingContext(
+                request,
                 locker,
                 totalWeight,
                 distance);
@@ -56,27 +75,23 @@ public class RankingService {
     }
 
     private double calculateAgreementPercentage(RankingContext rankingContext){
-        PointRequest request = rankingContext.request();
+        PointRequest request = rankingContext.pointRequest();
         double maxDistance = request.getMaxDistance();
-        double distanceScore = calculateDistanceScore(rankingContext.distance(), maxDistance);
+        double distanceScore = 1;
         double earnedScore = calculateTotalEarnedScore(rankingContext, distanceScore);
         return calculateAgreementPercentageFromScore(earnedScore, rankingContext.totalWeight());
     }
 
-    private double calculateDistanceScore(double distance, double maxDistance){
-        if (distance <= maxDistance) {
-            return (maxDistance - distance) / (maxDistance * (1 + K_SENSITIVITY * distance));
-        }
-        return 0;
-    }
-
     private double calculateTotalEarnedScore(RankingContext rankingContext, double distanceScore){
-        PointRequest request = rankingContext.request();
-        double earnedPoints = request.getDistanceWeight() * distanceScore;
-        earnedPoints += RULES.stream()
-                .filter(rule -> rule.feature().test(rankingContext.locker()))
-                .mapToDouble(rule -> rule.weightGetter().applyAsDouble(request))
+        PointRequest request = rankingContext.pointRequest();
+        ParcelLocker locker = rankingContext.parcelLocker();
+
+        double earnedPoints = scoreComponents.stream()
+                .mapToDouble(component -> {
+                    return component.weightProvider().applyAsDouble(request) * component.scoreProvider().applyAsDouble(locker, request);
+                })
                 .sum();
+
         return earnedPoints;
     }
 
@@ -86,15 +101,13 @@ public class RankingService {
     }
 
     private double calculateTotalWeight(PointRequest request) {
-        double sum = request.getDistanceWeight();
-        sum += RULES.stream()
-                .mapToDouble(rule -> rule.weightGetter().applyAsDouble(request))
+        return scoreComponents.stream()
+                .mapToDouble(component -> component.weightProvider().applyAsDouble(request))
                 .sum();
-        return sum;
     }
 
     private PointResult getPointResult(RankingContext rankingContext, double agreementPercentage){
-        ParcelLocker locker = rankingContext.locker();
+        ParcelLocker locker = rankingContext.parcelLocker();
         String resultAddress = locker.getAddress().line1() + " " + locker.getAddress().line2();
         double resultDistance = Math.round(rankingContext.distance() * 100.0) / 100.0;
         return new PointResult(
@@ -109,7 +122,11 @@ public class RankingService {
                 locker.isEasyAccessZone(),
                 locker.isPaymentAvailable(),
                 locker.getPrintInStore(),
-                locker.getLocationType()
+                locker.getLocationType(),
+                locker.getAirIndexLevel(),
+                locker.getType(),
+                locker.getLockerAvailability(),
+                locker.getFunctions()
         );
     }
 }
