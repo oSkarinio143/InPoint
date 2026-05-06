@@ -1,4 +1,4 @@
-_# InPoint — Top Rated Parcel Lockers
+# InPoint — Top Rated Parcel Lockers
 
 ## Author
 
@@ -51,14 +51,24 @@ I built a service that helps users find the best InPost parcel locker based on t
 
 ```bash
 # Clone 
-https://github.com/oSkarinio143/InPoint.git
-cd .\InPoint\
-
+git clone https://github.com/oSkarinio143/InPoint.git
+cd InPoint
+```
+### Option A: You have Maven installed
+```bash
 # Build 
 mvn clean install
 
 # Run 
 mvn spring-boot:run
+```
+### Option B: You DON'T have Maven installed (using Maven Wrapper)
+```bash
+# Build the project
+.\mvnw clean install
+
+# Run the application
+.\mvnw spring-boot:run
 ```
 ### Example API Usage
 
