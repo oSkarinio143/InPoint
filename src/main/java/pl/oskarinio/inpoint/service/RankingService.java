@@ -4,9 +4,10 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.oskarinio.inpoint.model.*;
-import pl.oskarinio.inpoint.model.record.RankingContext;
-import pl.oskarinio.inpoint.model.record.ScoreComponent;
-import pl.oskarinio.inpoint.model.request.PointRequest;
+import pl.oskarinio.inpoint.model.api.ParcelLocker;
+import pl.oskarinio.inpoint.model.RankingContext;
+import pl.oskarinio.inpoint.model.ScoreComponent;
+import pl.oskarinio.inpoint.model.PointRequest;
 
 import java.util.*;
 import java.util.stream.Collectors;

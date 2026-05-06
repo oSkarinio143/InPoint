@@ -7,7 +7,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import pl.oskarinio.inpoint.model.ParcelLocker;
+import pl.oskarinio.inpoint.model.api.ParcelLocker;
 import pl.oskarinio.inpoint.model.ParcelLockersResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

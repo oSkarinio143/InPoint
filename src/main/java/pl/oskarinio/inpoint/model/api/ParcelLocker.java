@@ -1,16 +1,10 @@
-package pl.oskarinio.inpoint.model;
+package pl.oskarinio.inpoint.model.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import pl.oskarinio.inpoint.model.record.AddressDto;
-import pl.oskarinio.inpoint.model.record.LocationDto;
-import pl.oskarinio.inpoint.model.request.LockerAvailabilityDto;
-import pl.oskarinio.inpoint.model.request.ParcelLockerStatus;
-import pl.oskarinio.inpoint.model.request.ParcelLockerType;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

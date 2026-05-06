@@ -1,4 +1,4 @@
-package pl.oskarinio.inpoint.model.record;
+package pl.oskarinio.inpoint.model.api;
 
 import lombok.Data;
 

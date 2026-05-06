@@ -1,4 +1,4 @@
-package pl.oskarinio.inpoint.model.request;
+package pl.oskarinio.inpoint.model.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

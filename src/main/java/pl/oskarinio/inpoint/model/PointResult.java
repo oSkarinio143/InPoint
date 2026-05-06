@@ -1,14 +1,12 @@
 package pl.oskarinio.inpoint.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.oskarinio.inpoint.model.request.ParcelLockerAvailabilityStatus;
-import pl.oskarinio.inpoint.model.request.ParcelLockerType;
+import pl.oskarinio.inpoint.model.api.ParcelLockerAvailabilityStatus;
+import pl.oskarinio.inpoint.model.api.ParcelLockerType;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 @AllArgsConstructor
