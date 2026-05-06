@@ -35,10 +35,9 @@ public class RequestService {
         System.out.println(p.getLocationType());
         log.info("Filtering completed. Found {} candidates.", filtered.size());
 
-        List<PointResult> responseList = rankingService.handleRanking(filtered, pointRequest);
+        List<PointResult> responseList = rankingService.rankPoints(filtered, pointRequest);
         List<PointResult> finalList = responseList.stream()
                         .limit(10).toList();
         return finalList;
-        //return filtered.isEmpty() ? null : filterService.mapParcelToResponse(filtered.get(0));
     }
 }

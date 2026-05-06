@@ -1,7 +1,7 @@
 package pl.oskarinio.inpoint.service;
 
 import org.springframework.stereotype.Service;
-import pl.oskarinio.inpoint.model.Coordinates;
+import pl.oskarinio.inpoint.model.DistanceCalculationData;
 import pl.oskarinio.inpoint.model.ParcelLocker;
 import pl.oskarinio.inpoint.model.PointRequest;
 import pl.oskarinio.inpoint.model.record.LocationDto;
@@ -10,15 +10,15 @@ import pl.oskarinio.inpoint.model.record.LocationDto;
 public class DistanceCalculatorService {
 
     public double calculateDistance(PointRequest request, ParcelLocker locker) {
-        Coordinates coordinates = calculateCoordinates(request, locker);
-        return calculateHaversinePattern(coordinates);
+        DistanceCalculationData distanceCalculationData = getDistanceCalculationData(request, locker);
+        return calculateHaversinePattern(distanceCalculationData);
     }
 
-    private Coordinates calculateCoordinates(PointRequest request, ParcelLocker locker){
+    private DistanceCalculationData getDistanceCalculationData(PointRequest request, ParcelLocker locker){
         LocationDto lockerLocation = locker.getLocation();
         double differenceLatitude = Math.toRadians(lockerLocation.latitude() - request.getLatitude());
         double differenceLongitude = Math.toRadians(lockerLocation.longitude() - request.getLongitude());
-        return new Coordinates(
+        return new DistanceCalculationData(
                 differenceLatitude,
                 differenceLongitude,
                 lockerLocation.latitude(),
@@ -26,11 +26,11 @@ public class DistanceCalculatorService {
         );
     }
 
-    private double calculateHaversinePattern(Coordinates coordinates){
+    private double calculateHaversinePattern(DistanceCalculationData distanceCalculationData){
         double earthRadius = 6371;
-        double factor = Math.sin(coordinates.getDifferenceLatitude() / 2) * Math.sin(coordinates.getDifferenceLatitude() / 2) +
-                Math.cos(Math.toRadians(coordinates.getLockerLatitude())) * Math.cos(Math.toRadians(coordinates.getRequestLatitude())) *
-                        Math.sin(coordinates.getDifferenceLongitude() / 2) * Math.sin(coordinates.getDifferenceLongitude() / 2);
+        double factor = Math.sin(distanceCalculationData.getDifferenceLatitude() / 2) * Math.sin(distanceCalculationData.getDifferenceLatitude() / 2) +
+                Math.cos(Math.toRadians(distanceCalculationData.getLockerLatitude())) * Math.cos(Math.toRadians(distanceCalculationData.getRequestLatitude())) *
+                        Math.sin(distanceCalculationData.getDifferenceLongitude() / 2) * Math.sin(distanceCalculationData.getDifferenceLongitude() / 2);
         return earthRadius * 2 * Math.atan2(Math.sqrt(factor), Math.sqrt(1 - factor));
 
     }

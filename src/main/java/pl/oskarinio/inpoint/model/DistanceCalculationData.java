@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Coordinates {
+public class DistanceCalculationData {
     private double differenceLatitude;
     private double differenceLongitude;
     private double lockerLatitude;
