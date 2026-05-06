@@ -1,18 +1,21 @@
 package pl.oskarinio.inpoint.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.oskarinio.inpoint.model.*;
+import pl.oskarinio.inpoint.model.record.LocationDto;
+import pl.oskarinio.inpoint.model.record.RankingRule;
 
 import java.util.*;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class RankingService {
 
     private static final double K_SENSITIVITY = 0.067;
 
+    private final DistanceCalculatorService distanceCalculatorService;
     private static final List<RankingRule> RULES = List.of(
             new RankingRule(ParcelLocker::isLocation247, PointRequest::getLocation247Weight),
             new RankingRule(ParcelLocker::isNext, PointRequest::getIsNextWeight),
@@ -33,44 +36,62 @@ public class RankingService {
     }
 
     private PointResult calculatePoint(ParcelLocker locker, PointRequest request, double totalWeight) {
-        // 1. Obliczamy fizyczny dystans (Haversine)
-        double distance = calculateHaversine(
-                request.getLatitude(), request.getLongitude(),
-                locker.getLocation().latitude(), locker.getLocation().longitude()
-        );
+        double distance = distanceCalculatorService.calculateDistance(request, locker);
+        double agreementPercentage = getAgreementPercentage(request, locker, distance, totalWeight);
+        return getPointResult(locker, agreementPercentage, distance);
+    }
 
+    private double getAgreementPercentage(PointRequest request, ParcelLocker locker, double distance, double totalWeight){
         double agreementPercentage = 0.0;
-
-        // 2. Liczymy scoring tylko, jeśli suma wag jest dodatnia
-        if (totalWeight > 0) {
-            double R = request.getMaxDistance();
-            double proximityScore = 0;
-
-            if (distance <= R) {
-                proximityScore = (R - distance) / (R * (1 + K_SENSITIVITY * distance));
-            }
-
-            double earnedPoints = 0;
-            // Punkty za dystans
-            earnedPoints += request.getDistanceWeight() * proximityScore;
-
-            // Punkty za cechy
-            for (RankingRule rule : RULES) {
-                if (rule.feature.test(locker)) {
-                    earnedPoints += rule.weightGetter.applyAsDouble(request);
-                }
-            }
-
-            double score = (earnedPoints / totalWeight) * 100.0;
-            agreementPercentage = Math.round(score * 100.0) / 100.0;
+        if (totalWeight == 0){
+            agreementPercentage = 100;
         }
 
-        // 3. Tworzymy wynik (zaokrąglamy dystans do 2 miejsc po przecinku)
+        if (totalWeight > 0) {
+            agreementPercentage = calculateAgreementPercentage(request, locker, distance, totalWeight);
+        }
+        return agreementPercentage;
+    }
+    private double calculateAgreementPercentage(PointRequest request, ParcelLocker locker, double distance, double totalWeight){
+        double maxDistance = request.getMaxDistance();
+        double proximityScore = 0;
+
+        if (distance <= maxDistance) {
+            proximityScore = (maxDistance - distance) / (maxDistance * (1 + K_SENSITIVITY * distance));
+        }
+
+        double earnedPoints = 0;
+
+        // Punkty za dystans
+        earnedPoints += request.getDistanceWeight() * proximityScore;
+
+        // Punkty za cechy
+        for (RankingRule rule : RULES) {
+            if (rule.feature().test(locker)) {
+                earnedPoints += rule.weightGetter().applyAsDouble(request);
+            }
+        }
+
+        double score = (earnedPoints / totalWeight) * 100.0;
+        return  Math.round(score * 100.0) / 100.0;
+    }
+
+    private double calculateTotalWeight(PointRequest request) {
+        double sum = request.getDistanceWeight();
+        sum += RULES.stream()
+                .mapToDouble(rule -> rule.weightGetter().applyAsDouble(request))
+                .sum();
+        return sum;
+    }
+
+    private PointResult getPointResult(ParcelLocker locker, double agreementPercentage, double distance){
+        String resultAddress = locker.getAddress().line1() + " " + locker.getAddress().line2();
+        double resultDistance = Math.round(distance * 100.0) / 100.0;
         return new PointResult(
                 agreementPercentage,
                 locker.getName(),
-                locker.getAddress().line1() + " " + locker.getAddress().line2(),
-                Math.round(distance * 100.0) / 100.0, // Nowe pole: dystans w km
+                resultAddress,
+                resultDistance,
                 locker.getLocation().latitude(),
                 locker.getLocation().longitude(),
                 locker.isLocation247(),
@@ -81,26 +102,4 @@ public class RankingService {
                 locker.getLocationType()
         );
     }
-
-    private double calculateTotalWeight(PointRequest r) {
-        double sum = r.getDistanceWeight();
-        for (RankingRule rule : RULES) {
-            sum += rule.weightGetter.applyAsDouble(r);
-        }
-        return sum;
-    }
-
-    private double calculateHaversine(double lat1, double lon1, double lat2, double lon2) {
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-
-    private record RankingRule(
-            Predicate<ParcelLocker> feature,
-            ToDoubleFunction<PointRequest> weightGetter
-    ) {}
 }
