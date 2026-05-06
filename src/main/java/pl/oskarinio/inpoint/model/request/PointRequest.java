@@ -1,4 +1,4 @@
-package pl.oskarinio.inpoint.model;
+package pl.oskarinio.inpoint.model.request;
 
 
 import jakarta.validation.constraints.Max;
@@ -7,11 +7,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 public class PointRequest {
 
-    private Status status;
+    private ParcelLockerStatus status;
 
     @NotNull(message = "Latitude is required")
     @Min(-90)
@@ -59,4 +61,14 @@ public class PointRequest {
     @Min(0)
     @Max(1)
     private Double airIndexLevelWeight;
+
+    @Min(0)
+    @Max(1)
+    private double typeWeight;
+
+    private ParcelLockerType type;
+
+    @Min(0)
+    @Max(1)
+    private double availabilityStatusWeight;
 }

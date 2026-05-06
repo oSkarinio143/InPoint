@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import pl.oskarinio.inpoint.model.record.AddressDto;
 import pl.oskarinio.inpoint.model.record.LocationDto;
+import pl.oskarinio.inpoint.model.request.LockerAvailabilityDto;
+import pl.oskarinio.inpoint.model.request.ParcelLockerStatus;
+import pl.oskarinio.inpoint.model.request.ParcelLockerType;
 
 import java.util.List;
 import java.util.Map;
@@ -14,11 +17,13 @@ import java.util.Map;
 public class ParcelLocker {
 
     private String name;
-    private Status status;
 
     private LocationDto location;
 
     private AddressDto address;
+
+    @JsonProperty("status")
+    private ParcelLockerStatus status;
 
     @JsonProperty("location_247")
     private boolean location247;
@@ -42,10 +47,10 @@ public class ParcelLocker {
     private String airIndexLevel;
 
     @JsonProperty("type")
-    private List<String> type;
+    private List<ParcelLockerType> type;
 
     @JsonProperty("locker_availability")
-    private Map<String, Object> lockerAvailability;
+    private LockerAvailabilityDto lockerAvailabilityStatus;
 
     @JsonProperty("functions")
     private List<String> functions;

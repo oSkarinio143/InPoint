@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pl.oskarinio.inpoint.model.request.ParcelLockerAvailabilityStatus;
+import pl.oskarinio.inpoint.model.request.ParcelLockerType;
 
 import java.util.List;
 import java.util.Map;
@@ -26,8 +28,7 @@ public class PointResult {
     private Boolean printInStore;
     private String locationType;
     private String airIndexLevel;
-    private List<String> type;
-    private Map<String, Object> lockerAvailability;
+    private List<ParcelLockerType> type;
+    private ParcelLockerAvailabilityStatus lockerAvailabilityStatus;
     private List<String> functions;
-
 }

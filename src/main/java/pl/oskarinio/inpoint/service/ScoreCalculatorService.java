@@ -3,7 +3,11 @@ package pl.oskarinio.inpoint.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.oskarinio.inpoint.model.ParcelLocker;
-import pl.oskarinio.inpoint.model.PointRequest;
+import pl.oskarinio.inpoint.model.request.ParcelLockerAvailabilityStatus;
+import pl.oskarinio.inpoint.model.request.ParcelLockerType;
+import pl.oskarinio.inpoint.model.request.PointRequest;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +64,33 @@ public class ScoreCalculatorService {
             case "BAD" -> 0.2;
             case "VERY_BAD" -> 0;
             default -> 0.0;
+        };
+    }
+
+    public double countTypeScore(PointRequest request, ParcelLocker locker) {
+        ParcelLockerType preferredType = request.getType();
+        List<ParcelLockerType> lockerTypes = locker.getType();
+        if (lockerTypes == null || lockerTypes.isEmpty()) {
+            return 0.0;
+        }
+
+        if (preferredType == null || lockerTypes.contains(preferredType)) {
+            return 1.0;
+        }
+        return 0.0;
+    }
+
+    public double countAvailabilityStatusScore(ParcelLocker locker){
+        ParcelLockerAvailabilityStatus status = locker.getLockerAvailabilityStatus().status();
+        if (status == null) {
+            return 0.0;
+        }
+
+        return switch (status) {
+            case NORMAL -> 1.0;
+            case LOW -> 0.3;
+            case VERY_LOW -> 0.1;
+            case NO_DATA -> 0;
         };
     }
 }

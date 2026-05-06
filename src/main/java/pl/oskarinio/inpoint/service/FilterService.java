@@ -3,7 +3,7 @@ package pl.oskarinio.inpoint.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.oskarinio.inpoint.model.ParcelLocker;
-import pl.oskarinio.inpoint.model.PointRequest;
+import pl.oskarinio.inpoint.model.request.PointRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.oskarinio.inpoint.model.PointRequest;
+import pl.oskarinio.inpoint.model.request.PointRequest;
 import pl.oskarinio.inpoint.model.PointResult;
 import pl.oskarinio.inpoint.service.RequestService;
 
